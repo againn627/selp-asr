@@ -1,0 +1,29 @@
+# 环境与模型（运行时和模型都是下载来的，不进仓库）
+runtime/
+.venv/
+models/
+
+# 本地配置：按需从 config.example.toml 复制一份来改
+config.toml
+*.wav
+*.mp3
+!docs/*.wav
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# 临时文件
+.tmp_*
+*.part
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

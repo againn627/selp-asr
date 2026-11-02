@@ -1,0 +1,45 @@
+# selp-asr 配置示例
+# 用法：复制一份改名成 config.toml 再改，重启服务生效。
+# 不复制也能跑——所有项都有代码默认值，就是这么一份配置。
+# 也可以用环境变量临时覆盖：ASR_HOST / ASR_PORT / ASR_TOKEN / ASR_MODEL_DIR
+
+[server]
+# 监听地址。127.0.0.1 = 只有本机能访问，推荐默认。
+# 改成 0.0.0.0 允许局域网访问，这时必须设置 token，否则拒绝启动。
+host = "127.0.0.1"
+port = 8765
+# 请求鉴权：Authorization: Bearer <token>
+# 留空 = 不校验（只适合本机自用）。换成别的服务商时这项跟着对方要求填。
+token = ""
+
+[model]
+# 模型档位，目前只有 qwen3-asr-0.6b
+model_type = "qwen3-asr-0.6b"
+# 模型目录。留空 = 自动决定（程序目录或用户数据目录）
+model_dir = "models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25"
+# VAD 模型，长音频自动分段用。文件不存在时退化为等长切分，不影响短句
+vad_model = "models/silero_vad.onnx"
+# VAD 单段最长语音（秒）
+vad_max_speech_seconds = 20
+# CPU 线程数。本机实测（i9-13900H，11 秒中文音频）：
+#   4 线程 RTF 0.50 / 6 线程 0.48 / 8 线程 0.47 / 12 线程 0.48
+# 6 线程在短句（2-5 秒，主要用法）上最快，长段只比 8 线程慢 2%，所以默认 6。
+# 核少就填核数，核多不建议超过 8（受内存带宽限制）。
+num_threads = 6
+# 单句最多生成 token 数
+max_new_tokens = 512
+# KV cache 长度。别改小：512 时超过 30 秒的音频会输出乱码
+max_total_len = 2048
+# 热词（逗号分隔），把常说的专有名词写进来能提升识别率
+# 例：hotwords = "你的产品名,张三,项目代号"
+hotwords = ""
+
+[behavior]
+# 启动时是否同步加载模型。
+# false（默认）：服务 0.5 秒就能接收请求，模型在后台加载（约 3 秒）；
+#               客户端按麦克风时正好与加载、说话重叠，第一句也不太等。
+# true： 启动时就加载，启动多等 3-4 秒。
+preload = false
+# 空闲多少秒后卸载模型释放内存，0 = 不卸载。
+# 300 秒：约 1.1 GB 回落到 87 MB，进程保留；下次说话时重新加载约 3 秒。
+idle_unload_seconds = 300

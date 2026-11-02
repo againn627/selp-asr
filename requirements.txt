@@ -1,0 +1,10 @@
+# 运行时依赖（pip install -r requirements.txt 装这些）
+sherpa-onnx==2.0.1
+numpy>=1.26
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+soundfile>=0.12
+
+# 只有麦克风录音测试（test-server.bat）需要
+sounddevice>=0.4.6
